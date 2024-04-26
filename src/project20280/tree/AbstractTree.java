@@ -6,7 +6,8 @@ import project20280.interfaces.Tree;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * An abstract base class providing some functionality of the Tree interface.
@@ -28,7 +29,7 @@ public abstract class AbstractTree<E> implements Tree<E> {
     @Override
     public boolean isInternal(Position<E> p) {
         // TODO
-        return false;
+        return numChildren(p) > 0;
     }
 
     /**
@@ -41,7 +42,7 @@ public abstract class AbstractTree<E> implements Tree<E> {
     @Override
     public boolean isExternal(Position<E> p) {
         // TODO
-        return false;
+        return numChildren(p) == 0;
     }
 
     /**
@@ -53,7 +54,7 @@ public abstract class AbstractTree<E> implements Tree<E> {
     @Override
     public boolean isRoot(Position<E> p) {
         // TODO
-        return false;
+        return p == root();
     }
 
     /**
@@ -66,7 +67,11 @@ public abstract class AbstractTree<E> implements Tree<E> {
     @Override
     public int numChildren(Position<E> p) {
         // TODO
-        return 0;
+        int count = 0;
+        for (Position<E> c : children(p)) {
+            count++;
+        }
+        return count;
     }
 
     /**
@@ -101,7 +106,11 @@ public abstract class AbstractTree<E> implements Tree<E> {
      */
     public int depth(Position<E> p) throws IllegalArgumentException {
         // TODO
-        return 0;
+        if (isRoot(p)) {
+            return 0;
+        } else {
+            return 1 + depth(parent(p));
+        }
     }
 
     /**
@@ -111,9 +120,11 @@ public abstract class AbstractTree<E> implements Tree<E> {
      */
     private int heightBad() {             // works, but quadratic worst-case time
         int h = 0;
-        for (Position<E> p : positions())
-            if (isExternal(p))                // only consider leaf positions
+        for (Position<E> p : positions()) {
+            if (isExternal(p)) {
                 h = Math.max(h, depth(p));
+            }
+        }
         return h;
     }
 
@@ -125,7 +136,11 @@ public abstract class AbstractTree<E> implements Tree<E> {
      */
     public int height(Position<E> p) throws IllegalArgumentException {
         // TODO
-        return 0;
+        int h = 0;
+        for (Position<E> c : children(p)) {
+            h = Math.max(h, 1 + height(c));
+        }
+        return h;
     }
 
     //---------- support for various iterations of a tree ----------

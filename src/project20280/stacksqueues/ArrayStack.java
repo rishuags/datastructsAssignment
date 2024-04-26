@@ -9,6 +9,7 @@ public class ArrayStack<E> implements Stack<E> {
      */
     public static final int CAPACITY = 100;   // default array capacity
 
+
     /**
      * Generic array used for storage of stack elements.
      */
@@ -17,13 +18,14 @@ public class ArrayStack<E> implements Stack<E> {
     /**
      * Index of the top element of the stack in the array.
      */
-    private final int t = -1;                      // index of the top element in stack
+    private int t = -1;                      // index of the top element in stack
 
     /**
      * Constructs an empty stack using the default array capacity.
      */
     public ArrayStack() {
         this(CAPACITY);
+
     }  // constructs stack with default capacity
 
     /**
@@ -34,6 +36,8 @@ public class ArrayStack<E> implements Stack<E> {
     @SuppressWarnings({"unchecked"})
     public ArrayStack(int capacity) {        // constructs stack with given capacity
         // TODO
+        data = (E[]) new Object[capacity];
+
     }
 
     /**
@@ -65,6 +69,16 @@ public class ArrayStack<E> implements Stack<E> {
     @Override
     public void push(E e) {
         // TODO
+
+        if(t == data.length - 1){
+            throw new IndexOutOfBoundsException("Stack Full BossMan");
+        } else {
+            t++;
+            data[t] = e;
+        }
+
+
+
     }
 
     /**
@@ -75,7 +89,10 @@ public class ArrayStack<E> implements Stack<E> {
     @Override
     public E top() {
         // TODO
-        return null;
+        if (isEmpty()) {
+            return null;
+        }
+        return data[t];
     }
 
     /**
@@ -86,7 +103,12 @@ public class ArrayStack<E> implements Stack<E> {
     @Override
     public E pop() {
         // TODO
-        return null;
+        if (isEmpty()) {
+            return null;
+        }
+            E e = data[t];
+        t--;
+        return e;
     }
 
     /**

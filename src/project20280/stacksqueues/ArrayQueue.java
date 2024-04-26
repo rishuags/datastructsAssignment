@@ -6,12 +6,16 @@ public class ArrayQueue<E> implements Queue<E> {
 
     private static final int CAPACITY = 1000;
     private E[] data;
-    private final int front = 0;
-    private final int size = 0;
+    private  int front;
+    private int rear;
+    private  int size;
 
     public ArrayQueue(int capacity) {
         // TODO
-
+        data = (E[]) new Object[capacity];
+        front = 0;
+        rear = -1;
+        size = 0;
     }
 
     public ArrayQueue() {
@@ -32,6 +36,11 @@ public class ArrayQueue<E> implements Queue<E> {
     @Override
     public void enqueue(E e) {
         // TODO
+        if (size == data.length)
+            throw new IllegalStateException("Queue is full");
+        rear = (rear + 1) % data.length;
+        data[rear] = e;
+        size++;
     }
 
     @Override
@@ -42,7 +51,14 @@ public class ArrayQueue<E> implements Queue<E> {
     @Override
     public E dequeue() {
         // TODO
-        return null;
+        if (isEmpty())
+            return null;
+        E removedElement = data[front];
+        data[front] = null; // for garbage collection
+        front = (front + 1) % data.length;
+        size--;
+        return removedElement;
+
     }
 
     public String toString() {

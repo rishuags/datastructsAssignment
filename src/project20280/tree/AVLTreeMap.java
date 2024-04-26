@@ -31,31 +31,39 @@ public class AVLTreeMap<K, V> extends TreeMap<K, V> {
      * Returns the height of the given tree position.
      */
     protected int height(Position<Entry<K, V>> p) {
-        // TODO
-        return 0;
+        return tree.getAux(p); // AVLTreeMap maintains height information in the auxiliary field of positions
     }
 
     /**
      * Recomputes the height of the given position based on its children's heights.
      */
     protected void recomputeHeight(Position<Entry<K, V>> p) {
-        // TODO
+        tree.setAux(p, 1 + Math.max(height(left(p)), height(right(p))));
     }
 
     /**
      * Returns whether a position has balance factor between -1 and 1 inclusive.
      */
     protected boolean isBalanced(Position<Entry<K, V>> p) {
-        // TODO
-        return false;
+        int balanceFactor = height(left(p)) - height(right(p));
+        return Math.abs(balanceFactor) <= 1;
     }
 
     /**
      * Returns a child of p with height no smaller than that of the other child.
      */
     protected Position<Entry<K, V>> tallerChild(Position<Entry<K, V>> p) {
-        // TODO
-        return null;
+        if (height(left(p)) > height(right(p)))
+            return left(p);
+        if (height(left(p)) < height(right(p)))
+            return right(p);
+        // Equal height children, return the child that matches parent's orientation
+        if (isRoot(p))
+            return left(p); // Arbitrarily choose left if both children have equal height
+        if (p == left(parent(p)))
+            return left(p);
+        else
+            return right(p);
     }
 
     /**
@@ -64,15 +72,13 @@ public class AVLTreeMap<K, V> extends TreeMap<K, V> {
      * imbalance is found, continuing until balance is restored.
      */
     protected void rebalance(Position<Entry<K, V>> p) {
-        // TODO
-    }
-
-    /**
-     * Overrides the TreeMap rebalancing hook that is called after an insertion.
-     */
-    @Override
-    protected void rebalanceInsert(Position<Entry<K, V>> p) {
-        rebalance(p);
+        while (p != null) {
+            recomputeHeight(p);
+            if (!isBalanced(p)) {
+                p = restructure(tallerChild(tallerChild(p)));
+            }
+            p = parent(p);
+        }
     }
 
     /**
@@ -80,7 +86,7 @@ public class AVLTreeMap<K, V> extends TreeMap<K, V> {
      */
     @Override
     protected void rebalanceDelete(Position<Entry<K, V>> p) {
-        // TODO
+        rebalance(p);
     }
 
     /**
@@ -91,9 +97,8 @@ public class AVLTreeMap<K, V> extends TreeMap<K, V> {
             if (isInternal(p)) {
                 if (p.getElement() == null)
                     System.out.println("VIOLATION: Internal node has null entry");
-                else if (height(p) != 1 + Math.max(height(left(p)), height(right(p)))) {
+                else if (!isBalanced(p)) {
                     System.out.println("VIOLATION: AVL unbalanced node with key " + p.getElement().getKey());
-                    dump();
                     return false;
                 }
             }
@@ -107,7 +112,7 @@ public class AVLTreeMap<K, V> extends TreeMap<K, V> {
     }
 
     public static void main(String[] args) {
-        AVLTreeMap avl = new AVLTreeMap<>();
+        AVLTreeMap<Integer, Integer> avl = new AVLTreeMap<>();
 
         Integer[] arr = new Integer[]{5, 3, 10, 2, 4, 7, 11, 1, 6, 9, 12, 8};
 

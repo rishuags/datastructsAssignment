@@ -2,9 +2,12 @@ package project20280.list;
 
 import project20280.interfaces.List;
 
+import java.lang.annotation.ElementType;
 import java.util.Iterator;
 
+
 public class SinglyLinkedList<E> implements List<E> {
+
 
     private static class Node<E> {
 
@@ -34,7 +37,7 @@ public class SinglyLinkedList<E> implements List<E> {
          * @return the element stored at the node
          */
         public E getElement() {
-            return null;
+            return element;
         }
 
         /**
@@ -72,56 +75,122 @@ public class SinglyLinkedList<E> implements List<E> {
     public SinglyLinkedList() {
     }              // constructs an initially empty list
 
-    //@Override
+    @Override
     public int size() {
         // TODO
-        return 0;
+
+        /*if (head == null) {
+            return 0;
+        } else {
+            Node<E> current = head;
+            while (current.getNext() != null) {
+                size++;
+            }
+        }*/
+
+
+        return size;
     }
 
-    //@Override
+    @Override
     public boolean isEmpty() {
         // TODO
-        return false;
+        return size == 0;
     }
 
     @Override
     public E get(int position) {
         // TODO
-        return null;
+
+        if (position < 0 || position >= size) {
+            throw new IndexOutOfBoundsException("Position does not exist! ");
+        }
+        Node<E> current = head;
+        for (int i = 0; i < position; i++) {
+            current = current.getNext();
+        }
+        return current.getElement();
     }
 
     @Override
     public void add(int position, E e) {
         // TODO
-    }
+        if (position < 0 || position > size) {
+            throw new IndexOutOfBoundsException("Position does not exist! ");
+        }
 
+        if (position == 0) {
+            addFirst(e);
+        } else {
+            Node<E> current = head;
+
+            for (int i = 0; i < position - 1; i++) {
+                current = current.getNext();
+            };
+
+
+            Node<E> newNode = new Node<>(e, current.getNext());
+            current.setNext(newNode);
+            size++;
+        }
+
+    }
 
     @Override
     public void addFirst(E e) {
         // TODO
+        Node<E> newNode = new Node<>(e, head);
+        head = newNode;
+        size++;
     }
 
     @Override
     public void addLast(E e) {
         // TODO
+        add(size, e);
     }
 
     @Override
     public E remove(int position) {
         // TODO
-        return null;
+        if (position < 0 || position > size) {
+            throw new IndexOutOfBoundsException("Position does not exist! ");
+        }
+
+        Node <E> current = head;
+        E removedElement;
+        if(position==0) {
+            removedElement = removeFirst();
+        } else{
+            for(int i=0; i<position-1; i++){
+                current = current.getNext();
+
+            }
+            removedElement=current.getNext().getElement();
+            current.setNext(current.getNext().getNext());
+            size--;
+        }
+
+        return removedElement;
     }
 
     @Override
     public E removeFirst() {
         // TODO
-        return null;
+        if(isEmpty()){
+            return null;
+        }
+
+        E removedElement = head.getElement();
+        head = head.getNext();
+        size--;
+        return removedElement;
     }
 
     @Override
     public E removeLast() {
-        // TODO
-        return null;
+        return remove(size - 1);
+
     }
 
     //@Override
@@ -159,23 +228,37 @@ public class SinglyLinkedList<E> implements List<E> {
     }
 
     public static void main(String[] args) {
-        SinglyLinkedList<Integer> ll = new SinglyLinkedList<Integer>();
+        SinglyLinkedList<Integer> ll = new SinglyLinkedList<>();
+
         System.out.println("ll " + ll + " isEmpty: " + ll.isEmpty());
         //LinkedList<Integer> ll = new LinkedList<Integer>();
 
-        ll.addFirst(0);
+        System.out.println("size: " + ll.size());
+        ll.add(0,1);
+
+        System.out.println("size: " + ll.size());
+        ll.add(1,2);
+        System.out.println("size: " + ll.size());
+
+
+        //System.out.println(ll.get(0));
+        System.out.println(ll.get(0));
+        System.out.println(ll.get(1));
+        System.out.println(ll);
+        /*ll.addFirst(0);
         ll.addFirst(1);
         ll.addFirst(2);
         ll.addFirst(3);
         ll.addFirst(4);
-        ll.addLast(-1);
+        ll.addLast(-1);*/
+
         //ll.removeLast();
         //ll.removeFirst();
         //System.out.println("I accept your apology");
         //ll.add(3, 2);
-        System.out.println(ll);
-        ll.remove(5);
-        System.out.println(ll);
+        //System.out.println(ll);
+        //ll.remove(5);
+        //System.out.println(ll);
 
 //        for(Integer i : ll) {
 //            System.out.println(i);

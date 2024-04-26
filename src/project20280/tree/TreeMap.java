@@ -61,6 +61,12 @@ public class TreeMap<K, V> extends AbstractSortedMap<K, V> {
          */
         private void relink(Node<Entry<K, V>> parent, Node<Entry<K, V>> child, boolean makeLeftChild) {
             // TODO
+            if (makeLeftChild)
+                parent.setLeft(child);
+            else
+                parent.setRight(child);
+            if (child != null)
+                child.setParent(parent);
         }
 
         /**
@@ -79,6 +85,23 @@ public class TreeMap<K, V> extends AbstractSortedMap<K, V> {
          */
         public void rotate(Position<Entry<K, V>> p) {
             // TODO
+            Node<Entry<K, V>> node = validate(p);
+            Node<Entry<K, V>> parent = node.getParent();
+            Node<Entry<K, V>> grandparent = parent.getParent();
+            if (grandparent == null) {
+                //tree.setRoot(node);
+                node.setParent(null);
+            } else {
+                boolean makeLeftChild = (parent == grandparent.getLeft());
+                relink(grandparent, node, makeLeftChild);
+            }
+            if (node == parent.getLeft()) {
+                relink(parent, node.getRight(), true);
+                relink(node, parent, false);
+            } else {
+                relink(parent, node.getLeft(), false);
+                relink(node, parent, true);
+            }
         }
 
         /**
@@ -111,7 +134,16 @@ public class TreeMap<K, V> extends AbstractSortedMap<K, V> {
          */
         public Position<Entry<K, V>> restructure(Position<Entry<K, V>> x) {
             // TODO
-            return null;
+            Position<Entry<K, V>> y = parent(x);
+            Position<Entry<K, V>> z = parent(y);
+            if ((x == right(y)) == (y == right(z))) {
+                rotate(y);
+                return y;
+            } else {
+                rotate(x);
+                rotate(x);
+                return x;
+            }
         }
     } // ----------- end of nested BalanceableBinaryTree class -----------
 
