@@ -1,5 +1,8 @@
 package wordle;
 
+import project20280.tree.BinaryTreePrinter;
+import project20280.tree.LinkedBinaryTree;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -29,6 +32,25 @@ public class Wordle {
 
 //        System.out.println("dict length: " + this.dictionary.size());
 //        System.out.println("dict: " + dictionary);
+        HuffmanEncoding huffman = new HuffmanEncoding();
+
+        LinkedBinaryTree<String> tree = huffman.getHuffmanTree(dictionary);
+
+        BinaryTreePrinter<String> printer = new BinaryTreePrinter<>(tree);
+        String treeString = printer.print();
+        System.out.println(treeString);
+
+        HuffmanEncoding.getCharEncoding(tree,"",tree.root());
+        double asciiLength = 0;
+        double huffmanLength = 0;
+        for(String word : dictionary){
+            for(char c : word.toCharArray()){
+                asciiLength += 8;
+                String string = Character.toString(c);
+                huffmanLength += HuffmanEncoding.charEncode.get(string).length();
+            }
+        }
+        System.out.println("The ratio is: " + huffmanLength/asciiLength);
 
     }
 
@@ -49,6 +71,8 @@ public class Wordle {
     public void play(String target) {
         // TODO
         // TODO: You have to fill in the code
+        HuffmanEncoding huffman = new HuffmanEncoding();
+        Map<String, Integer> wordFrequencyMap = huffman.getWordFrequency(dictionary);
         for(int i = 0; i < num_guesses; ++i) {
             String guess = getGuess();
 
@@ -105,6 +129,65 @@ public class Wordle {
                 }
 
             }
+            /***/
+            for(int a = 0; a < 5; a++){
+                Map<String , Integer> wordsToRemove = new HashMap<>();
+                if(Objects.equals(hint[a], "+")) {
+                    for (Map.Entry<String, Integer> entry : wordFrequencyMap.entrySet()) {
+                        if (!Objects.equals(entry.getKey().charAt(a), guess.charAt(a))) {
+                            wordsToRemove.put(entry.getKey(), entry.getValue());
+                        }
+                    }
+                }
+
+                else if(Objects.equals(hint[a], "_")){
+                    int numOfDuplicates = 1;
+                    char letter = '!';
+                    for(int c = 0; c < 5; c++){
+                        if(guess.charAt(c) == guess.charAt(a) && a!=c){
+                            if(hint[c].charAt(0)!='_') {
+                                numOfDuplicates++;
+                                letter = guess.charAt(c);
+                            }
+                        }
+                    }
+                    for(Map.Entry<String,Integer> entry : wordFrequencyMap.entrySet()){
+                        int numOfDictionaryDuplicates = 1;
+                        for(int d = 0; d < 5; d++){
+                            if(entry.getKey().charAt(d) == letter) {
+                                numOfDictionaryDuplicates++;
+                            }
+                        }
+                        if(numOfDictionaryDuplicates>numOfDuplicates ){
+                            wordsToRemove.put(entry.getKey(), entry.getValue());
+                        }
+
+                        else if (entry.getKey().indexOf(guess.charAt(a)) != -1 && letter == '!') {
+                            wordsToRemove.put(entry.getKey(), entry.getValue());
+                        }
+                    }
+                }
+
+                else if(Objects.equals(hint[a],"o")){
+                    for(Map.Entry<String,Integer> entry : wordFrequencyMap.entrySet()){
+
+                        if (Objects.equals(entry.getKey().charAt(a), guess.charAt(a))) {
+                            wordsToRemove.put(entry.getKey(), entry.getValue());
+                        }
+
+                        if(entry.getKey().indexOf(guess.charAt(a)) == -1){
+                            wordsToRemove.put(entry.getKey(),entry.getValue());
+                        }
+
+
+                    }
+                }
+
+
+                for(Map.Entry<String,Integer> entry : wordsToRemove.entrySet()){
+                    wordFrequencyMap.remove(entry.getKey(),entry.getValue());
+                }
+            }
 
 
             // after setting the yellow and green positions, the remaining hint positions must be "not present" or "_"
@@ -120,7 +203,24 @@ public class Wordle {
                  win(target);
                  return;
             }
+            int count = 1;
+            for(Map.Entry<String,Integer> entry : wordFrequencyMap.entrySet()){
+                System.out.println(count + ": Word: " + entry.getKey() + "\nFrequency: " + entry.getValue());
+                count++;
+            }
+
+            int maxValue = Integer.MIN_VALUE;
+            String maxKey = null;
+            for(Map.Entry<String,Integer> entry : wordFrequencyMap.entrySet()){
+                if(entry.getValue()>maxValue){
+                    maxValue = entry.getValue();
+                    maxKey = entry.getKey();
+                }
+            }
+            System.out.println("Your next guess should be: " + maxKey);
         }
+
+
 
         lost(target);
     }
