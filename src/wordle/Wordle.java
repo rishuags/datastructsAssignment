@@ -60,8 +60,8 @@ public class Wordle {
         String target = game.getRandomTargetWord();
 
         //System.out.println("target: " + target);
-        String testTarget = "regal";
-        game.play(testTarget);
+//        String testTarget = "regal";
+        game.play(target);
         target.toCharArray()[0] = '!';
 
 
@@ -130,62 +130,58 @@ public class Wordle {
 
             }
             /***/
-            for(int a = 0; a < 5; a++){
-                Map<String , Integer> wordsToRemove = new HashMap<>();
-                if(Objects.equals(hint[a], "+")) {
+            for (int pos = 0; pos < 5; pos++) {
+                Map<String, Integer> wordsToRemove = new HashMap<>();
+
+                // Handling '+' hint
+                if (hint[pos].equals("+")) {
                     for (Map.Entry<String, Integer> entry : wordFrequencyMap.entrySet()) {
-                        if (!Objects.equals(entry.getKey().charAt(a), guess.charAt(a))) {
+                        if (entry.getKey().charAt(pos) != guess.charAt(pos)) {
                             wordsToRemove.put(entry.getKey(), entry.getValue());
                         }
                     }
                 }
-
-                else if(Objects.equals(hint[a], "_")){
+                // Handling '_' hint
+                else if (hint[pos].equals("_")) {
                     int numOfDuplicates = 1;
                     char letter = '!';
-                    for(int c = 0; c < 5; c++){
-                        if(guess.charAt(c) == guess.charAt(a) && a!=c){
-                            if(hint[c].charAt(0)!='_') {
+                    for (int c = 0; c < 5; c++) {
+                        if (guess.charAt(c) == guess.charAt(pos) && pos != c) {
+                            if (hint[c].charAt(0) != '_') {
                                 numOfDuplicates++;
                                 letter = guess.charAt(c);
                             }
                         }
                     }
-                    for(Map.Entry<String,Integer> entry : wordFrequencyMap.entrySet()){
+                    for (Map.Entry<String, Integer> entry : wordFrequencyMap.entrySet()) {
                         int numOfDictionaryDuplicates = 1;
-                        for(int d = 0; d < 5; d++){
-                            if(entry.getKey().charAt(d) == letter) {
+                        for (int d = 0; d < 5; d++) {
+                            if (entry.getKey().charAt(d) == letter) {
                                 numOfDictionaryDuplicates++;
                             }
                         }
-                        if(numOfDictionaryDuplicates>numOfDuplicates ){
+                        if (numOfDictionaryDuplicates > numOfDuplicates) {
+                            wordsToRemove.put(entry.getKey(), entry.getValue());
+                        } else if (entry.getKey().indexOf(guess.charAt(pos)) != -1 && letter == '!') {
                             wordsToRemove.put(entry.getKey(), entry.getValue());
                         }
-
-                        else if (entry.getKey().indexOf(guess.charAt(a)) != -1 && letter == '!') {
+                    }
+                }
+                // Handling 'o' hint
+                else if (hint[pos].equals("o")) {
+                    for (Map.Entry<String, Integer> entry : wordFrequencyMap.entrySet()) {
+                        if (entry.getKey().charAt(pos) == guess.charAt(pos)) {
+                            wordsToRemove.put(entry.getKey(), entry.getValue());
+                        }
+                        if (entry.getKey().indexOf(guess.charAt(pos)) == -1) {
                             wordsToRemove.put(entry.getKey(), entry.getValue());
                         }
                     }
                 }
 
-                else if(Objects.equals(hint[a],"o")){
-                    for(Map.Entry<String,Integer> entry : wordFrequencyMap.entrySet()){
-
-                        if (Objects.equals(entry.getKey().charAt(a), guess.charAt(a))) {
-                            wordsToRemove.put(entry.getKey(), entry.getValue());
-                        }
-
-                        if(entry.getKey().indexOf(guess.charAt(a)) == -1){
-                            wordsToRemove.put(entry.getKey(),entry.getValue());
-                        }
-
-
-                    }
-                }
-
-
-                for(Map.Entry<String,Integer> entry : wordsToRemove.entrySet()){
-                    wordFrequencyMap.remove(entry.getKey(),entry.getValue());
+                // Removing the words to remove from the main map
+                for (Map.Entry<String, Integer> entry : wordsToRemove.entrySet()) {
+                    wordFrequencyMap.remove(entry.getKey());
                 }
             }
 
@@ -205,19 +201,19 @@ public class Wordle {
             }
             int count = 1;
             for(Map.Entry<String,Integer> entry : wordFrequencyMap.entrySet()){
-                System.out.println(count + ": Word: " + entry.getKey() + "\nFrequency: " + entry.getValue());
+                //System.out.println(count + ": Word: " + entry.getKey() + "\nFrequency: " + entry.getValue());
                 count++;
             }
 
-            int maxValue = Integer.MIN_VALUE;
-            String maxKey = null;
+            int val = Integer.MIN_VALUE;
+            String key = null;
             for(Map.Entry<String,Integer> entry : wordFrequencyMap.entrySet()){
-                if(entry.getValue()>maxValue){
-                    maxValue = entry.getValue();
-                    maxKey = entry.getKey();
+                if(entry.getValue()>val){
+                    val = entry.getValue();
+                    key = entry.getKey();
                 }
             }
-            System.out.println("Your next guess should be: " + maxKey);
+            System.out.println("Your next guess should be: " + key);
         }
 
 
